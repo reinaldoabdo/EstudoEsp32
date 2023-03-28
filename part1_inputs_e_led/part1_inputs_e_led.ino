@@ -1,13 +1,11 @@
 #include <Arduino.h>
 #include <driver/gpio.h>
 #include <Bounce2.h>
-#include <hid.h>
 
-
-#define MAX_BUTTONS 19
 const gpio_num_t led_pin = GPIO_NUM_2;
 
-const int BUTTON_PINS[MAX_BUTTONS] = { 3, 4, 5, 12, 13, 14, 15, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33};
+const int BUTTON_PINS[] = { 3, 4, 5, 12, 13, 14, 15, 18, 19, 21, 22, 23, 25, 26, 27, 32, 33};
+const int MAX_BUTTONS = sizeof(BUTTON_PINS) / sizeof(BUTTON_PINS[0]);
 
 Bounce* buttons[MAX_BUTTONS];
 
@@ -28,7 +26,7 @@ void setup() {
   for (int i = 0; i < MAX_BUTTONS; i++) {
     io_conf.pin_bit_mask = (1ULL << BUTTON_PINS[i]);
     gpio_config(&io_conf);
-    buttons[i] = new Bounce(BUTTON_PINS[i], 2); // debounce interval of 2ms
+    buttons[i] = new Bounce(BUTTON_PINS[i], 2); // debounce 2ms
   }
 
 
@@ -39,13 +37,13 @@ void setup() {
 void loop() {
   for (int i = 0; i < MAX_BUTTONS; i++) {
     buttons[i]->update();
-    if (buttons[i]->fell()) { // when button is pressed
+    if (buttons[i]->fell()) { 
       Serial.println(String(BUTTON_PINS[i]) + " apertado!");
-      gpio_set_level(led_pin, 1); // turn on built-in LED
+      gpio_set_level(led_pin, 1); 
     }
-    if (buttons[i]->rose()) { // when button is released
-      gpio_set_level(led_pin, 0); // turn off built-in LED
+    if (buttons[i]->rose()) { 
+      gpio_set_level(led_pin, 0); 
     }
   }
-  delay(1); // a small delay to avoid excessive processing
+  delay(1); 
 }
